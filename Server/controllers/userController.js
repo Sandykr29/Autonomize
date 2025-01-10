@@ -53,18 +53,21 @@ const searchUsers = async (req, res) => {
 
 // Soft delete a user (check if user exists first)
 const softDeleteUser = async (req, res) => {
-    const { username } = req.params;
-    try {
-        const user = await User.findOne({ username });
-        if (!user) return res.status(404).json({ error: 'User not found' });
+    const { id } = req.params;
 
-        user.isDeleted = true;
-        await user.save();
-        res.status(200).json({ message: "User soft deleted" });
+    try {
+        const user = await User.findOne({ _id: id, isDeleted: false });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found or is deleted' });
+        }
+        const updatedUser = await User.findOneAndUpdate({ _id:id, isDeleted: false },{ isDeleted: true },{ new: true } );
+
+        res.status(200).json({ message: "User soft deleted", user: updatedUser });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 // Update user details
 const updateUser = async (req, res) => {

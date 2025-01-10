@@ -13,7 +13,7 @@ const router = express.Router();
 router.get('/save/:username', saveUser);
 router.get('/mutual-friends/:username', findMutualFriends);
 router.get('/search', searchUsers);
-router.delete('/soft-delete/:username', softDeleteUser);
+router.delete('/soft-delete/:id', softDeleteUser);
 router.patch('/update/:id', updateUser);
 router.get('/list', listUsers);
 
