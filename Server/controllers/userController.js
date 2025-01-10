@@ -68,18 +68,20 @@ const softDeleteUser = async (req, res) => {
 
 // Update user details
 const updateUser = async (req, res) => {
-    const { username } = req.params;
+    const { id } = req.params;
+
     try {
-        const updatedUser = await User.findOneAndUpdate(
-            { username, isDeleted: false },
-            req.body,
-            { new: true }
-        );
+        const user = await User.findOne({ _id: id, isDeleted: false });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found or is deleted' });
+        }
+        const updatedUser = await User.findOneAndUpdate({ _id: id, isDeleted: false },req.body,{ new: true, runValidators: true });
         res.status(200).json(updatedUser);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 // List users and sort based on query
 const listUsers = async (req, res) => {
