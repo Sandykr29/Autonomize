@@ -4,41 +4,18 @@ const { fetchGitHubUser } = require('../utils/githubAPI');
 // Save user or return if already exists
 const saveUser = async (req, res) => {
     const { username } = req.params;
-
     try {
-        // Check if the user already exists
         let user = await User.findOne({ username, isDeleted: false });
         if (user) return res.status(200).json(user);
 
-        // Fetch GitHub data
         const gitHubData = await fetchGitHubUser(username);
-        console.log(gitHubData, "this is data checking");
-
-        // Map GitHub data to your schema
-        const userData = {
-            username: gitHubData.login, // Map "login" to "username"
-            name: gitHubData.name || '',
-            location: gitHubData.location || '',
-            blog: gitHubData.blog && gitHubData.blog.trim() !== '' ? gitHubData.blog : null, // Handle empty blog field
-            bio: gitHubData.bio || '',
-            public_repos: gitHubData.public_repos || 0,
-            public_gists: gitHubData.public_gists || 0,
-            followers: gitHubData.followers || 0,
-            following: gitHubData.following || 0,
-            created_at: new Date(gitHubData.created_at),
-            updated_at: new Date(gitHubData.updated_at),
-        };
-
-        // Save to the database
-        user = new User(userData);
+        user = new User({ ...gitHubData, username });
         await user.save();
         res.status(201).json(user);
     } catch (error) {
-        console.error("Error saving user:", error.message);
         res.status(500).json({ error: error.message });
     }
 };
-
 
 // Find mutual friends
 const findMutualFriends = async (req, res) => {

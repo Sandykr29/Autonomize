@@ -14,6 +14,6 @@ const userSchema = new mongoose.Schema({
     updated_at: Date,
     friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     isDeleted: { type: Boolean, default: false }
-});
+},{versionKey:false});
 
 module.exports = mongoose.model('User', userSchema);
